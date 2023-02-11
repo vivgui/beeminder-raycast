@@ -1,13 +1,4 @@
-import {
-  List,
-  ActionPanel,
-  Action,
-  popToRoot,
-  showToast,
-  Toast,
-  Form,
-  useNavigation,
-} from "@raycast/api";
+import { List, ActionPanel, Action, popToRoot, showToast, Toast, Form } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { fetchGoals, sendDatapoint } from "./api";
 import { fromUnixTime, differenceInDays } from "date-fns";
@@ -15,7 +6,6 @@ import { fromUnixTime, differenceInDays } from "date-fns";
 export default function Beeminder() {
   const [goals, setGoals] = useState();
   const [loading, setLoading] = useState(true);
-  const { pop } = useNavigation();
 
   async function fetchData() {
     setLoading(true);
@@ -49,17 +39,56 @@ export default function Beeminder() {
   }, []);
 
   function ValueForm({ goalSlug }) {
+    const [dataPointError, setDataPointError] = useState();
+
+    function dropDataPointErrorIfNeeded() {
+      if (dataPointError && dataPointError.length > 0) {
+        setDataPointError(undefined);
+      }
+    }
+
+    function validateDataPoint(event) {
+      if (event.target.value?.length == 0) {
+        setDataPointError("The field should't be empty!");
+      } else {
+        dropDataPointErrorIfNeeded();
+      }
+    }
+
+    function handleDataPointInputChange(event) {
+      if (event > 0) {
+        dropDataPointErrorIfNeeded();
+      } else {
+        setDataPointError("This field should't be empty!");
+      }
+
+      if (isNaN(event)) {
+        setDataPointError("This field should be a number!");
+      }
+    }
+
     return (
       <Form
         actions={
           <ActionPanel>
             <Action.SubmitForm
               onSubmit={async (values) => {
-                setLoading(true);
-                await sendDatapoint(goalSlug, values.datapoint, values.comment);
-                pop();
-                await new Promise((resolve) => setTimeout(resolve, 1000));
-                await fetchData();
+                try {
+                  await sendDatapoint(goalSlug, values.datapoint, values.comment);
+                  popToRoot();
+                  await showToast({
+                    style: Toast.Style.Success,
+                    title: "Datapoint submitted",
+                    message: "Your datapoint was submitetd successfully",
+                  });
+                } catch (error) {
+                  popToRoot();
+                  await showToast({
+                    style: Toast.Style.Failure,
+                    title: "Something went wrong",
+                    message: "Failed to submit your datapoint",
+                  });
+                }
               }}
             />
           </ActionPanel>
@@ -68,7 +97,12 @@ export default function Beeminder() {
         <Form.TextField
           id="datapoint"
           title="Datapoint"
+          autoFocus
           placeholder={`Enter datapoint for ${goalSlug}`}
+          error={dataPointError}
+          onChange={(event) => handleDataPointInputChange(event)}
+          onFocus={(event) => validateDataPoint(event)}
+          onBlur={(event) => validateDataPoint(event)}
         />
 
         <Form.TextField id="comment" title="Comment" defaultValue="Sent from Raycast 🐝" />
@@ -76,12 +110,11 @@ export default function Beeminder() {
     );
   }
 
-  function Goals({ goalsData }) {
+  function GoalsList({ goalsData }) {
     return (
       <List isLoading={loading}>
         {goalsData?.map((goal) => {
-          // const goalLoseDate = formatDistance(fromUnixTime(goal.losedate), new Date());
-          const goalDue = goal.limsum.split("+")?.[1].split(" (")?.[0];
+          const [beforeIn, afterIn] = goal.limsum.split("+")?.[1].split(" (")?.[0].split(" in ");
           let goalIcon;
 
           if (differenceInDays(fromUnixTime(goal.losedate), new Date()) < 1) {
@@ -99,7 +132,9 @@ export default function Beeminder() {
               key={goal.slug}
               title={goal.slug}
               subtitle={`Pledged $${goal.pledge}`}
-              accessories={[{ text: `Due ${goalDue}`, icon: goalIcon }]}
+              accessories={[
+                { text: `Due ${beforeIn} ${goal.gunits} in ${afterIn}`, icon: goalIcon },
+              ]}
               keywords={[goal.slug, goal.title]}
               actions={
                 <ActionPanel>
@@ -117,5 +152,5 @@ export default function Beeminder() {
     );
   }
 
-  return <Goals goalsData={goals} />;
+  return <GoalsList goalsData={goals} />;
 }

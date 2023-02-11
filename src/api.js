@@ -10,7 +10,7 @@ export async function fetchGoals() {
   return response;
 }
 
-export async function sendDatapoint(goalSlug: string, datapoint: string, comment: string) {
+export async function sendDatapoint(goalSlug, datapoint, comment) {
   const { beeminderApiToken, beeminderUsername } = getPreferenceValues();
   const datapointUrl = `https://www.beeminder.com/api/v1/users/${beeminderUsername}/goals/${goalSlug}/datapoints.json`;
 

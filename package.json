@@ -1,16 +1,16 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "beeminder",
-  "title": "Beeminder",
-  "description": "",
-  "icon": "command-icon.png",
+  "name": "beeraycast",
+  "title": "beeRaycast",
+  "description": "Manage your Beeminder goals from Raycast",
+  "icon": "beelogo.png",
   "author": "vivgui",
   "license": "MIT",
   "commands": [
     {
       "name": "beeminder",
-      "title": "Beeminder",
-      "description": "",
+      "title": "beeRaycast",
+      "description": "Manage your Beeminder goals from Raycast",
       "mode": "view"
     }
   ],
