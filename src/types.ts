@@ -18,18 +18,23 @@ export interface DataPointResponse {
   status: string;
 }
 
-export type GoalResponse = Goal[] | GoalErrorNoToken | GoalErrorBadToken | undefined;
-export interface GoalErrorNoToken {
+export type GoalResponse = Goal[] | GoalError | undefined;
+
+type GoalError = GoalErrorNoToken & GoalErrorBadToken;
+
+type GoalErrorNoToken = {
   errors: {
     message: string;
     token: string;
   };
-}
+};
 
-export interface GoalErrorBadToken {
-  auth_token: string;
-  message: string;
-}
+type GoalErrorBadToken = {
+  errors: {
+    auth_token: string;
+    message: string;
+  };
+};
 
 export interface Goal {
   slug: string;
@@ -44,7 +49,10 @@ export interface Goal {
   goal_type: string;
   autodata: string;
   healthkitmetric: string;
-  autodata_config: Autodata_config;
+  autodata_config: {
+    name: string;
+    note: string;
+  };
   losedate: number;
   deadline: number;
   leadtime: number;
@@ -64,7 +72,12 @@ export interface Goal {
   frozen: boolean;
   lost: boolean;
   won: boolean;
-  contract: Contract;
+  contract: {
+    amount: number;
+    stepdown_at: null;
+    pending_amount: null;
+    pending_at: null;
+  };
   delta_text: string;
   safebump: number;
   safesum: string;
@@ -102,9 +115,9 @@ export interface Goal {
   movingav: boolean;
   aura: boolean;
   numpts: number;
-  road: any[];
-  roadall: any[];
-  fullroad: any[];
+  road: [];
+  roadall: [];
+  fullroad: [];
   secret: boolean;
   pledge: number;
   mathishard: number[];
@@ -112,44 +125,21 @@ export interface Goal {
   datapublic: boolean;
   graphsum: string;
   rah: number;
-  last_datapoint: Last_datapoint;
+  last_datapoint: {
+    timestamp: number;
+    value: number;
+    comment: string;
+    id: string;
+    updated_at: number;
+    requestid: null;
+    canonical: string;
+    fulltext: string;
+    origin: string;
+    creator: string;
+    daystamp: string;
+  };
   callback_url: null;
-  tags: any[];
-  recent_data: RecentDataItem[];
-  dueby: any[];
-}
-interface Autodata_config {
-  name: string;
-  note: string;
-}
-interface Contract {
-  amount: number;
-  stepdown_at: null;
-  pending_amount: null;
-  pending_at: null;
-}
-interface Last_datapoint {
-  timestamp: number;
-  value: number;
-  comment: string;
-  id: string;
-  updated_at: number;
-  requestid: null;
-  canonical: string;
-  fulltext: string;
-  origin: string;
-  creator: string;
-  daystamp: string;
-}
-interface RecentDataItem {
-  id: string;
-  fulltext: string;
-  canonical: string;
-  origin: string;
-  urtext: null;
-  measured_at: string;
-  created_at: string;
-  comment: string;
-  value: number;
-  daystamp: string;
+  tags: [];
+  recent_data: [];
+  dueby: [];
 }

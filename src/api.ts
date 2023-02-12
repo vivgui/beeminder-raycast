@@ -1,5 +1,5 @@
-import { getPreferenceValues } from "@raycast/api";
 import fetch from "node-fetch";
+import { getPreferenceValues } from "@raycast/api";
 import { DataPointResponse, GoalResponse, Preferences } from "./types";
 
 export async function fetchGoals(): Promise<GoalResponse> {

@@ -6,7 +6,7 @@ import { Goal, GoalResponse } from "./types";
 
 export default function Beeminder() {
   const [goals, setGoals] = useState<GoalResponse>();
-  const [loading, setLoading] = useState<boolean | undefined>(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   async function fetchData() {
     setLoading(true);
@@ -14,20 +14,24 @@ export default function Beeminder() {
       const goalsData = await fetchGoals();
       setLoading(false);
 
-      if (goalsData.errors?.auth_token === "bad_token") {
-        await showToast({
-          style: Toast.Style.Failure,
-          title: "Bad Auth Token",
-          message: "Please check your auth token in the extension preferences.",
-        });
-        popToRoot();
-      } else if (goalsData.errors?.token === "no_token") {
-        await showToast({
-          style: Toast.Style.Failure,
-          title: "No Auth Token",
-          message: "Please set your auth token in the extension preferences.",
-        });
-        popToRoot();
+      if (!Array.isArray(goalsData) && goalsData?.errors) {
+        if (goalsData.errors.auth_token === "bad_token") {
+          await showToast({
+            style: Toast.Style.Failure,
+            title: "Bad Auth Token",
+            message: "Please check your auth token in the extension preferences.",
+          });
+          popToRoot();
+        }
+
+        if (goalsData.errors.token === "no_token") {
+          await showToast({
+            style: Toast.Style.Failure,
+            title: "No Auth Token",
+            message: "Please set your auth token in the extension preferences.",
+          });
+          popToRoot();
+        }
       } else {
         // Happy path
         setGoals(goalsData);
