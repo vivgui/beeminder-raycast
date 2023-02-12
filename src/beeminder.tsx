@@ -1,11 +1,12 @@
 import { List, ActionPanel, Action, popToRoot, showToast, Toast, Form } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { fetchGoals, sendDatapoint } from "./api";
 import { fromUnixTime, differenceInDays } from "date-fns";
+import { fetchGoals, sendDatapoint } from "./api";
+import { Goal, GoalResponse } from "./types";
 
 export default function Beeminder() {
-  const [goals, setGoals] = useState();
-  const [loading, setLoading] = useState(true);
+  const [goals, setGoals] = useState<GoalResponse>();
+  const [loading, setLoading] = useState<boolean | undefined>(true);
 
   async function fetchData() {
     setLoading(true);
@@ -18,6 +19,13 @@ export default function Beeminder() {
           style: Toast.Style.Failure,
           title: "Bad Auth Token",
           message: "Please check your auth token in the extension preferences.",
+        });
+        popToRoot();
+      } else if (goalsData.errors?.token === "no_token") {
+        await showToast({
+          style: Toast.Style.Failure,
+          title: "No Auth Token",
+          message: "Please set your auth token in the extension preferences.",
         });
         popToRoot();
       } else {
@@ -38,8 +46,8 @@ export default function Beeminder() {
     fetchData();
   }, []);
 
-  function ValueForm({ goalSlug }) {
-    const [dataPointError, setDataPointError] = useState();
+  function ValueForm({ goalSlug }: { goalSlug: string }) {
+    const [dataPointError, setDataPointError] = useState<string | undefined>();
 
     function dropDataPointErrorIfNeeded() {
       if (dataPointError && dataPointError.length > 0) {
@@ -47,7 +55,7 @@ export default function Beeminder() {
       }
     }
 
-    function validateDataPoint(event) {
+    function validateDataPoint(event: Form.Event<string[] | string>) {
       if (event.target.value?.length == 0) {
         setDataPointError("The field should't be empty!");
       } else {
@@ -55,14 +63,15 @@ export default function Beeminder() {
       }
     }
 
-    function handleDataPointInputChange(event) {
-      if (event > 0) {
+    function handleDataPointInputChange(event: string) {
+      const eventToNumber = Number(event);
+      if (eventToNumber > 0) {
         dropDataPointErrorIfNeeded();
       } else {
         setDataPointError("This field should't be empty!");
       }
 
-      if (isNaN(event)) {
+      if (isNaN(eventToNumber)) {
         setDataPointError("This field should be a number!");
       }
     }
@@ -79,14 +88,14 @@ export default function Beeminder() {
                   await showToast({
                     style: Toast.Style.Success,
                     title: "Datapoint submitted",
-                    message: "Your datapoint was submitetd successfully",
+                    message: "Your datapoint was submitted successfully",
                   });
                 } catch (error) {
                   popToRoot();
                   await showToast({
                     style: Toast.Style.Failure,
                     title: "Something went wrong",
-                    message: "Failed to submit your datapoint",
+                    message: "Failed to send your datapoint",
                   });
                 }
               }}
@@ -110,10 +119,11 @@ export default function Beeminder() {
     );
   }
 
-  function GoalsList({ goalsData }) {
+  function GoalsList({ goalsData }: { goalsData: GoalResponse }) {
+    const goals = Array.isArray(goalsData) ? goalsData : undefined;
     return (
       <List isLoading={loading}>
-        {goalsData?.map((goal) => {
+        {goals?.map((goal: Goal) => {
           const [beforeIn, afterIn] = goal.limsum.split("+")?.[1].split(" (")?.[0].split(" in ");
           let goalIcon;
 
