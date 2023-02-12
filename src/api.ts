@@ -1,14 +1,14 @@
 import { getPreferenceValues } from "@raycast/api";
 import fetch from "node-fetch";
-import { Goal, DataPointResponse, GoalErrors, Preferences } from "./types";
+import { DataPointResponse, GoalResponse, Preferences } from "./types";
 
-export async function fetchGoals(): Promise<Goal[] | GoalErrors> {
+export async function fetchGoals(): Promise<GoalResponse> {
   const { beeminderApiToken, beeminderUsername } = getPreferenceValues<Preferences>();
   const goalsUrl = `https://www.beeminder.com/api/v1/users/${beeminderUsername}/goals?auth_token=${beeminderApiToken}`;
 
   const response = await fetch(goalsUrl).then((response) => response.json());
 
-  return response as Goal[] | GoalErrors;
+  return response as GoalResponse;
 }
 
 export async function sendDatapoint(
