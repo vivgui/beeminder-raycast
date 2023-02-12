@@ -82,6 +82,7 @@ export default function Beeminder() {
 
     return (
       <Form
+        navigationTitle={`Add a datapoint for goal "${goalSlug}"`}
         actions={
           <ActionPanel>
             <Action.SubmitForm

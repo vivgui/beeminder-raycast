@@ -32,8 +32,8 @@
   "preferences": [
     {
       "name": "beeminderApiToken",
-      "title": "Beeminder API Token",
-      "description": "Your Beeminder API Token",
+      "title": "Personal Auth Token",
+      "description": "Your Personal Auth Token for the Beeminder API",
       "type": "password",
       "default": "",
       "required": true

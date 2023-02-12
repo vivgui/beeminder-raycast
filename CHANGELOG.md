@@ -1,3 +1,3 @@
-# Beeminder Changelog
+# BeeRaycast Changelog
 
-## [Initial Version] - 2023-02-04
+## [Initial Version] - 2023-02-12
