@@ -4,6 +4,10 @@
   "title": "BeeRaycast",
   "description": "Manage your Beeminder goals from Raycast",
   "icon": "beelogo.png",
+  "categories": [
+    "Productivity",
+    "Web"
+  ],
   "author": "vivgui",
   "license": "MIT",
   "commands": [
