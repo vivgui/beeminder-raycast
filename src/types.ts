@@ -1,10 +1,24 @@
-export type GoalResponse = Goal[] | GoalErrorNoToken | GoalErrorBadToken | undefined;
-
 export interface Preferences {
   beeminderApiToken: string;
   beeminderUsername: string;
 }
 
+export interface DataPointResponse {
+  timestamp: number;
+  value: number;
+  comment: string;
+  id: string;
+  updated_at: number;
+  requestid: null;
+  canonical: string;
+  fulltext: string;
+  origin: string;
+  creator: string;
+  daystamp: string;
+  status: string;
+}
+
+export type GoalResponse = Goal[] | GoalErrorNoToken | GoalErrorBadToken | undefined;
 export interface GoalErrorNoToken {
   errors: {
     message: string;
@@ -138,19 +152,4 @@ interface RecentDataItem {
   comment: string;
   value: number;
   daystamp: string;
-}
-
-export interface DataPointResponse {
-  timestamp: number;
-  value: number;
-  comment: string;
-  id: string;
-  updated_at: number;
-  requestid: null;
-  canonical: string;
-  fulltext: string;
-  origin: string;
-  creator: string;
-  daystamp: string;
-  status: string;
 }
