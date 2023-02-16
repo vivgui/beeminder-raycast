@@ -89,9 +89,8 @@ export default function Command() {
           const timeDiffDuration = moment.duration(timeDiff);
           const dayDifference = moment.unix(goal.losedate).diff(new Date(), "days");
 
-          const [beforeIn, afterIn] = goal.limsum.split("+")?.[1].split(" (")?.[0].split(" in ");
           let goalIcon;
-          let dueText = `${beforeIn} ${goal.gunits} due in ${
+          let dueText = `${goal.gunits} ${goal.gunits} due in ${
             dayDifference > 1
               ? dayDifference + " days"
               : dayDifference == 1
@@ -101,7 +100,7 @@ export default function Command() {
 
           if (dayDifference < 1) {
             goalIcon = "🔴";
-            dueText = `${beforeIn} ${goal.gunits} due in${
+            dueText = `${goal.gunits} ${goal.gunits} due in${
               timeDiffDuration.hours() > 1
                 ? " " + timeDiffDuration.hours() + " hours"
                 : timeDiffDuration.hours() == 1
