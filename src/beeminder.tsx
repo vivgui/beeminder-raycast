@@ -93,29 +93,25 @@ export default function Command() {
           const goalRate = goal.rate % 1 === 0 ? goal.rate : goal.rate.toFixed(2);
 
           let goalIcon;
-          let dueText = `${goalRate} ${goal.gunits} due in ${
-            dayDifference > 1
-              ? dayDifference + " days"
-              : dayDifference == 1
-              ? dayDifference + " day"
-              : ""
-          }`;
+
+          let dueText = `${goalRate} ${goal.gunits} due in `;
+          if (dayDifference > 1) {
+            dueText += `${dayDifference} days`;
+          } else if (dayDifference === 1) {
+            dueText += `${dayDifference} day`;
+          }
 
           if (dayDifference < 1) {
             goalIcon = "🔴";
-            dueText = `${goalRate} ${goal.gunits} due in${
-              timeDiffDuration.hours() > 1
-                ? " " + timeDiffDuration.hours() + " hours"
-                : timeDiffDuration.hours() == 1
-                ? " " + timeDiffDuration.hours() + " hour"
-                : ""
-            }${
-              timeDiffDuration.minutes() > 1
-                ? " " + timeDiffDuration.minutes() + " minutes"
-                : timeDiffDuration.minutes() == 1
-                ? " " + timeDiffDuration.minutes() + " minute"
-                : ""
-            }`;
+            // When dayDifference is less than one, express due time in hours and/or minutes
+            const hours = timeDiffDuration.hours();
+            const minutes = timeDiffDuration.minutes();
+            if (hours > 0) {
+              dueText += hours > 1 ? `${hours} hours` : `${hours} hour`;
+            }
+            if (minutes > 0) {
+              dueText += minutes > 1 ? ` ${minutes} minutes` : ` ${minutes} minute`;
+            }
           } else if (dayDifference < 2) {
             goalIcon = "🟠";
           } else if (dayDifference < 3) {
