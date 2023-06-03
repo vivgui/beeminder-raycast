@@ -1,8 +1,9 @@
 import { List, ActionPanel, Action, popToRoot, showToast, Toast, Form } from "@raycast/api";
 import { usePromise, useForm } from "@raycast/utils";
 import moment from "moment";
-import { Goal, GoalResponse, DataPointFormValues } from "./types";
+import { Goal, GoalResponse, DataPointFormValues, Preferences } from "./types";
 import { fetchGoals, sendDatapoint } from "./api";
+import { getPreferenceValues } from "@raycast/api";
 
 export default function Command() {
   const { isLoading, data: goals, revalidate: fetchData } = usePromise(fetchGoals);
@@ -81,6 +82,7 @@ export default function Command() {
   }
 
   function GoalsList({ goalsData }: { goalsData: GoalResponse }) {
+    const { beeminderUsername } = getPreferenceValues<Preferences>();
     const goals = Array.isArray(goalsData) ? goalsData : undefined;
     return (
       <List isLoading={isLoading}>
@@ -141,6 +143,10 @@ export default function Command() {
                   <Action.Push
                     title="Enter datapoint"
                     target={<DataPointForm goalSlug={goal.slug} />}
+                  />
+                  <Action.OpenInBrowser
+                    title="Open goal in Beeminder"
+                    url={`https://www.beeminder.com/${beeminderUsername}/${goal.slug}`}
                   />
                   <Action title="Refresh data" onAction={async () => await fetchData()} />
                 </ActionPanel>
