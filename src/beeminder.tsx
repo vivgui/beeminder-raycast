@@ -1,12 +1,47 @@
-import { List, ActionPanel, Action, popToRoot, showToast, Toast, Form } from "@raycast/api";
-import { usePromise, useForm } from "@raycast/utils";
+import {
+  List,
+  ActionPanel,
+  Action,
+  popToRoot,
+  showToast,
+  Toast,
+  Form,
+  getPreferenceValues,
+  Cache,
+} from "@raycast/api";
+import { useForm } from "@raycast/utils";
 import moment from "moment";
 import { Goal, GoalResponse, DataPointFormValues, Preferences } from "./types";
 import { fetchGoals, sendDatapoint } from "./api";
-import { getPreferenceValues } from "@raycast/api";
+import { useEffect, useState } from "react";
+
+const cache = new Cache();
 
 export default function Command() {
-  const { isLoading, data: goals, revalidate: fetchData } = usePromise(fetchGoals);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [goals, setGoals] = useState<GoalResponse | undefined>(() => {
+    const cachedGoals = cache.get("goals");
+    return cachedGoals ? JSON.parse(cachedGoals) : undefined;
+  });
+
+  function fetchData() {
+    return fetchGoals()
+      .then((data) => {
+        // When the data changes, update the cache
+        cache.set("goals", JSON.stringify(data));
+        setGoals(data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        setIsLoading(false);
+      });
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   // error handling
   if (!Array.isArray(goals) && goals?.errors) {
